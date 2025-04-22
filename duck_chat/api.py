@@ -59,7 +59,7 @@ class DuckChat:
     ) -> None:
         await self._session.__aexit__(exc_type, exc_value, traceback)
 
-    async def get_vqd_from_headers(self, headers) -> None:
+    def get_vqd_from_headers(self, headers) -> None:
         return {
           k: v for k,v in response.headers.items() if "vqd" in k.lower()
         }
