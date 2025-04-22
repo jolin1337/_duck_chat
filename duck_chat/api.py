@@ -59,6 +59,10 @@ class DuckChat:
     ) -> None:
         await self._session.__aexit__(exc_type, exc_value, traceback)
 
+    async def get_vqd_from_headers(self, headers) -> None:
+        return {
+          k: v for k,v in response.headers.items() if "vqd" in k.lower()
+        }
     async def get_vqd(self) -> None:
         """Get new x-vqd-4 token"""
         async with self._session.get(
@@ -73,7 +77,7 @@ class DuckChat:
                 else:
                     raise RatelimitException(err_message)
             if "x-vqd-4" in response.headers:
-                self.vqd.append(response.headers["x-vqd-4"])
+                self.vqd.append(self.get_vqd_from_headers(response.headers))
             else:
                 raise DuckChatException("No x-vqd-4")
 
@@ -83,7 +87,7 @@ class DuckChat:
             "https://duckduckgo.com/duckchat/v1/chat",
             headers={
                 "Content-Type": "application/json",
-                "x-vqd-4": self.vqd[-1],
+               **self.vqd[-1],
             },
             data=self.__encoder.encode(self.history),
         ) as response:
@@ -110,7 +114,7 @@ class DuckChat:
                         raise RatelimitException(err_message)
                     raise DuckChatException(err_message)
                 message.append(x.get("message", ""))
-        self.vqd.append(response.headers.get("x-vqd-4", ""))
+        self.vqd.append(self.get_vqd_from_headers(response.headers))
         return "".join(message)
 
     async def ask_question(self, query: str) -> str:
