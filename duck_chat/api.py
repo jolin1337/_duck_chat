@@ -61,7 +61,7 @@ class DuckChat:
 
     def get_vqd_from_headers(self, headers) -> None:
         return {
-          k: v for k,v in response.headers.items() if "vqd" in k.lower()
+          k: v for k,v in headers.items() if "vqd" in k.lower()
         }
     async def get_vqd(self) -> None:
         """Get new x-vqd-4 token"""
